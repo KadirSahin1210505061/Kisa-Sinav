@@ -1,0 +1,155 @@
+#include <iostream>
+#include <algorithm>
+#include <ctime>
+
+#define A_SIZE 20
+#define G_SIZE 10
+#define MAX_W 10
+#define INF INT_MAX
+
+void generate(int a[], int size);
+void function1(int a[], int size);
+int function2(int a[], int size);
+void function3(int g[][G_SIZE], int d[][G_SIZE], int size);
+void print1(int a[], int size);
+void print2(int g[][G_SIZE], int size);
+void print3(int d[][G_SIZE], int size, int t);
+
+int main() {
+    int a[A_SIZE];
+    int g[G_SIZE][G_SIZE] = {
+        { 0, 10,  3,  0,  0,  5,  0, 17,  0, 22},
+        {10,  0,  5,  0,  2,  0, 13,  0,  0,  0},
+        { 3,  5,  0,  2,  0,  4,  0, 21,  0, 11},
+        { 0,  0,  2,  0,  7,  0,  6,  0,  0,  0},
+        { 0,  2,  0,  7,  0,  6,  0,  0, 19,  0},
+        { 5,  0,  4,   0,  6,  0,  9,  3,  0,  0},
+        { 0, 13,  0,  6,  0,  9,  0,  4,  0,  0},
+        {17,  0, 21,  0,  0,  3,  4,  0,  8,  0},
+        { 0,  0,  0,  0, 19,  0,  0,  8,  0,  5},
+        {22,  0, 11,  0,  0,  0,  0,  0,  5,  0}
+    };
+    int d[G_SIZE][G_SIZE];
+    int t;
+
+    srand(time(NULL));
+
+    clock_t start, end;
+    double time;
+
+    start = clock();
+
+    generate(a, A_SIZE);
+    std::cout << "A:" << std::endl;
+    print1(a, A_SIZE);
+
+    function1(a, A_SIZE);
+    std::cout << "\nFunction1 Sonuc:" << std::endl;
+    print1(a, A_SIZE);
+
+    t = function2(a, A_SIZE);
+    std::cout << "\nFunction2 Sonuc: " << t << std::endl;
+
+    std::cout << "\nG:" << std::endl;
+    print2(g, G_SIZE);
+
+    function3(g, d, G_SIZE);
+    std::cout << "\nFunction3 Sonuc:" << std::endl;
+    print2(d, G_SIZE);
+
+    std::cout << "\"Function3 Sonuc:" << std::endl;
+    print2(d, G_SIZE);
+
+    std::cout << "\n" << t << " icin sonuc:" << std::endl;
+    print3(d, G_SIZE, t);
+
+    end = clock();
+    time = ((double)(end - start)) / CLOCKS_PER_SEC;
+    std::cout << "\nCalisma Suresi: " << time << " sn" << std::endl;
+
+    return 0;
+}
+void generate(int a[], int size) {
+    for (int i = 0; i < size; i++) {
+        a[i] = rand() % (2 * MAX_W) - MAX_W;
+    }
+}
+
+void function1(int a[], int size) {
+    std::sort(a, a + size);
+}
+
+int function2(int a[], int size) {
+    int t = 0, current_sum = 0, count = 0;
+    for (int i = 0; i < size; i++) {
+        if (current_sum + a[i] > 0) {
+            current_sum = current_sum + a[i];
+        }
+        else {
+            current_sum = 0;
+        }
+        if (current_sum > t) {
+            t = current_sum;
+            count++;
+        }
+    }
+    return t / count;
+}
+
+void function3(int g[][G_SIZE], int d[][G_SIZE], int size) {
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            if (i == j) {
+                d[i][j] = 0;
+            }
+            else if (g[i][j] != 0) {
+                d[i][j] = g[i][j];
+            }
+            else {
+                d[i][j] = INF;
+            }
+        }
+    }
+    for (int k = 0; k < size; k++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (d[i][k] != INF && d[k][j] != INF && d[i][k] + d[k][j] < d[i][j]) {
+                    d[i][j] = d[i][k] + d[k][j];
+                }
+            }
+        }
+    }
+}
+
+void print1(int a[], int size) {
+    for (int i = 0; i < size; i++) {
+        std::cout << a[i] << " ";
+        if ((i + 1) % 10 == 0) {
+            std::cout << std::endl;
+        }
+    }
+}
+
+void print2(int g[][G_SIZE], int size) {
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            if (g[i][j] == INF) {
+                std::cout << "INF ";
+            }
+            else {
+                std::cout << g[i][j] << " ";
+            }
+        }
+        std::cout << std::endl;
+    }
+}
+
+void print3(int d[][G_SIZE], int size, int t) {
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            if (i != j && d[i][j] < t) {
+                std::cout << char('A' + i) << " -> " << char('A' + j) << ": " << d[i][j] << std::endl;
+            }
+        }
+    }
+}
